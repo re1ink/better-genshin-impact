@@ -53,4 +53,10 @@ public partial class GenshinStartConfig : ObservableObject
     /// </summary>
     [ObservableProperty]
     private bool _autoDisableGenshinHdrEnabled = true;
+
+    /// <summary>
+    ///     启动前自动将原神分辨率设为 1920×1080 窗口模式，启动后恢复原始设置
+    /// </summary>
+    [ObservableProperty]
+    private bool _autoSetResolutionEnabled = true;
 }

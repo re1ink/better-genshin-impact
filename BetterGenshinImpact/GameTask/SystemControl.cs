@@ -29,6 +29,13 @@ public class SystemControl
         var workdir = Path.GetDirectoryName(path) ?? "";
         var arg = cfg.GenshinStartArgs;
 
+        // === 启动前：强制设 1920×1080 窗口 ===
+        bool resolutionForced = false;
+        if (cfg.AutoSetResolutionEnabled)
+        {
+            resolutionForced = GenshinResolutionRegistryHelper.SetTo1920x1080();
+        }
+
         if (cfg.StartGameWithCmd)
         {
             var psi = new ProcessStartInfo
@@ -55,6 +62,12 @@ public class SystemControl
             var handle = FindGenshinImpactHandle();
             if (handle != 0)
             {
+                // 窗口已出现 → 原神已读取注册表，此时可安全恢复原始分辨率
+                if (resolutionForced)
+                {
+                    GenshinResolutionRegistryHelper.RestoreOriginal();
+                }
+
                 await Task.Delay(2333);
                 handle = FindGenshinImpactHandle();
                 await Task.Delay(2577);
@@ -62,6 +75,12 @@ public class SystemControl
             }
 
             await Task.Delay(5577);
+        }
+
+        // 超时未找到窗口，也要恢复（清理兜底）
+        if (resolutionForced)
+        {
+            GenshinResolutionRegistryHelper.RestoreOriginal();
         }
 
         return FindGenshinImpactHandle();
